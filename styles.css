@@ -64,6 +64,7 @@ body {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   position: relative;
+  margin-left: 10px;
 }
 
 .delete-button {
@@ -123,9 +124,125 @@ body {
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
+  width: inherit;
+}
+
+#simplifyTextBtn {
+  width: inherit;
 }
 
 /* Resizing state */
 #text-simplifier-sidebar.resizing {
   user-select: none;
+}
+
+.spinner {
+  margin: 20px auto;
+  width: 70px;
+  text-align: center;
+}
+
+.spinner > div {
+  width: 18px;
+  height: 18px;
+  background-color: #4CAF50;
+  border-radius: 100%;
+  display: inline-block;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  animation-delay: -0.16s;
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% { 
+    transform: scale(0);
+  } 40% { 
+    transform: scale(1.0);
+  }
+}
+
+/* Error Indicator */
+.error-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+  background-color: #ffebee;
+  color: #d32f2f;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.error-indicator p {
+  margin: 0;
+  max-width: 250px;
+}
+
+/* Error Card Styles */
+.error-card {
+  background-color: #ffebee;
+  border: 1px solid #ff5252;
+  color: #d32f2f;
+  position: relative;
+}
+
+.error-card .delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #d32f2f;
+}
+
+.error-card .error-icon {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.error-card .error-message {
+  text-align: center;
+  word-wrap: break-word;
+}
+
+/* Loading Indicator Adjustments */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Fixed height */
+  width: 100%;
+  background-color: #f5f5f5;
+  margin-left: 10px;
+}
+
+.loading-indicator p {
+  margin-top: 10px;
+  color: #666;
+}
+
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Fixed height */
+  background-color: white;
+  margin: 10px 0;
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }

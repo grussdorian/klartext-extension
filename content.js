@@ -1,82 +1,107 @@
-// Function to highlight the sentence
-function highlightSentence(sentence, element) {
-  const span = document.createElement('span');
-  span.style.textDecoration = 'underline';
-  span.style.textDecorationColor = '#d3bce3';
-  span.style.textDecorationThickness = '3px'; // Thicker underline
-  span.style.transition = 'text-decoration 0.3s ease-in-out, text-shadow 0.3s ease-in-out';
-  span.style.textShadow = '0 0 5px #d3bce3'; // Glow effect
-  span.textContent = sentence;
+class SimplificationSidebar {
+  constructor() {
+    this.sidebarElement = null;
+    this.simplifications = [];
+    this.initializeSidebar();
+    this.loadSimplifications();
+    this.setupMessageListener();
+  }
 
-  element.innerHTML = element.innerHTML.replace(sentence, span.outerHTML);
+  initializeSidebar() {
+    this.sidebarElement = document.createElement('div');
+    this.sidebarElement.id = 'text-simplifier-sidebar';
+    this.sidebarElement.classList.add('hidden');
+    document.body.appendChild(this.sidebarElement);
+  }
+
+  setupMessageListener() {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'apiResponse') {
+        this.addSimplification(message);
+      } else if (message.action === 'toggleSidebar') {
+        this.toggleSidebar();
+      }
+    });
+  }
+
+  addSimplification(data) {
+    const simplification = {
+      originalText: data.originalText,
+      simplifiedText: data.simplifiedText,
+      url: data.url,
+      timestamp: data.timestamp
+    };
+
+    this.simplifications.push(simplification);
+    this.saveSimplifications();
+    this.renderSidebar();
+
+    // Show sidebar automatically
+    this.showSidebar();
+  }
+
+  renderSidebar() {
+    if (!this.sidebarElement) return;
+
+    this.sidebarElement.innerHTML = this.simplifications.length 
+      ? this.simplifications.map((item, index) => `
+          <div class="simplification-card">
+            <button class="delete-button" data-index="${index}">&times;</button>
+            <div class="original-text">${item.originalText}</div>
+            <div class="simplified-text">${item.simplifiedText}</div>
+            <div class="metadata">
+              <span>${new URL(item.url).hostname}</span>
+              <span>${new Date(item.timestamp).toLocaleString()}</span>
+            </div>
+          </div>
+        `).join('')
+      : '<div class="placeholder">No simplifications yet</div>';
+
+    this.attachDeleteHandlers();
+  }
+
+  attachDeleteHandlers() {
+    const deleteButtons = this.sidebarElement.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const index = e.target.dataset.index;
+        this.simplifications.splice(index, 1);
+        this.saveSimplifications();
+        this.renderSidebar();
+      });
+    });
+  }
+
+  loadSimplifications() {
+    const saved = localStorage.getItem('textSimplifications');
+    this.simplifications = saved ? JSON.parse(saved) : [];
+    this.renderSidebar();
+  }
+
+  saveSimplifications() {
+    localStorage.setItem('textSimplifications', JSON.stringify(this.simplifications));
+  }
+
+  toggleSidebar() {
+    this.sidebarElement.classList.toggle('hidden');
+  }
+
+  showSidebar() {
+    this.sidebarElement.classList.remove('hidden');
+  }
 }
 
-// Function to remove the highlight
-function removeHighlight() {
-  document.querySelectorAll('span').forEach(span => {
-    span.style.textDecoration = 'none';
-    span.style.textShadow = 'none'; // Remove glow effect
-  });
-}
+// Initialize sidebar on page load
+const sidebar = new SimplificationSidebar();
 
-// Function to find the sentence where the cursor is located
-function getSentence(element, x, y) {
-  const range = document.caretRangeFromPoint(x, y);
-  if (!range) return null;
-
-  const textNode = range.startContainer;
-  if (textNode.nodeType !== Node.TEXT_NODE) return null;
-
-  const textContent = textNode.textContent;
-  const offset = range.startOffset;
-
-  const start = textContent.lastIndexOf('.', offset - 1) + 1;
-  const end = textContent.indexOf('.', offset) + 1 || textContent.length;
-
-  return textContent.slice(start, end).trim();
-}
-
-// Function to debounce the hover effect
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
-
-// Event listener for mouse hover
-document.addEventListener('mousemove', debounce((event) => {
-  const target = event.target;
-  if (target.isContentEditable || ['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'AUDIO'].includes(target.tagName)) {
-    return;
-  }
-  const sentence = getSentence(target, event.clientX, event.clientY);
-  if (sentence) {
-    removeHighlight();
-    highlightSentence(sentence, target);
-  }
-}, 500));
-
-// Event listener for mouse out
-document.addEventListener('mouseout', (event) => {
-  if (!event.relatedTarget || !event.relatedTarget.closest('span')) {
-    removeHighlight();
-  }
-});
-
-// Event listener for click
-document.addEventListener('click', (event) => {
-  const target = event.target;
-  if (target.isContentEditable || ['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'AUDIO'].includes(target.tagName)) {
-    return;
-  }
-  const sentence = getSentence(target, event.clientX, event.clientY);
-  if (sentence) {
-    console.log(`sending sentence to service worker: ${sentence}`);
-    const audience = 'General Public';
-    chrome.runtime.sendMessage({ text: sentence, audience }, (response) => {
-      console.log('Response from service worker:', response);
+// Listen for text simplification request
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'simplifyText') {
+    // Forward request to background script
+    chrome.runtime.sendMessage({
+      action: 'apiRequest',
+      text: message.text,
+      audience: message.audience
     });
   }
 });

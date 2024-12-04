@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#text-simplifier-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #f4f4f4;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  z-index: 10000;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+#text-simplifier-sidebar.hidden {
+  transform: translateX(100%);
+}
+
+.simplification-card {
+  background-color: white;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.original-text {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.simplified-text {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.metadata {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: #666;
+}
+
+.placeholder {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.popup-container {
+  width: 250px;
+  padding: 10px;
+  text-align: center;
+}
+
+#toggleSidebarBtn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}

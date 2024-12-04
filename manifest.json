@@ -3,7 +3,7 @@
   "name": "Klartext",
   "version": "1.0",
   "description": "Simplify websites using AI",
-  "permissions": ["storage", "activeTab", "contextMenus"],
+  "permissions": ["storage", "activeTab", "contextMenus", "scripting"],
   "host_permissions": ["https://*/*"],
   "action": {
     "default_popup": "popup/popup.html",
@@ -19,7 +19,8 @@
   "content_scripts": [
     {
       "matches": ["https://*/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "css": ["styles.css"]
     }
   ]
 }

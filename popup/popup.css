@@ -36,7 +36,7 @@ select {
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #2e9dbc;
   border: none;
   color: white;
   padding: 10px 20px;
@@ -51,5 +51,5 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #2687a2;
 }

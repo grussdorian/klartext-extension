@@ -34,7 +34,7 @@ body {
 .sidebar-close-button {
   background: none;
   border: none;
-  color: #666;
+  color: red;
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -113,7 +113,7 @@ body {
 }
 
 #toggleSidebarBtn {
-  background-color: #4CAF50;
+  background-color: #2e9dbc;
   border: none;
   color: white;
   padding: 10px 20px;
@@ -145,7 +145,7 @@ body {
 .spinner > div {
   width: 18px;
   height: 18px;
-  background-color: #4CAF50;
+  background-color: #2e9dbc;
   border-radius: 100%;
   display: inline-block;
   animation: sk-bouncedelay 1.4s infinite ease-in-out both;

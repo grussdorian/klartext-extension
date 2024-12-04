@@ -1,6 +1,7 @@
 class SimplificationSidebar {
   constructor() {
     this.sidebarElement = null;
+    this.resizeHandle = null;
     this.simplifications = [];
     this.initializeSidebar();
     this.loadSimplifications();
@@ -11,7 +12,61 @@ class SimplificationSidebar {
     this.sidebarElement = document.createElement('div');
     this.sidebarElement.id = 'text-simplifier-sidebar';
     this.sidebarElement.classList.add('hidden');
+    // Create sidebar header with close button
+    const sidebarHeader = document.createElement('div');
+    sidebarHeader.classList.add('sidebar-header');
+    
+    const closeButton = document.createElement('button');
+    closeButton.classList.add('sidebar-close-button');
+    closeButton.innerHTML = '&times;';
+    closeButton.addEventListener('click', () => this.hideSidebar());
+    
+    sidebarHeader.appendChild(closeButton);
+
+    // Create content container for simplifications
+    this.contentContainer = document.createElement('div');
+    this.contentContainer.classList.add('sidebar-content');
+
+    // Create resize handle
+    this.resizeHandle = document.createElement('div');
+    this.resizeHandle.classList.add('resize-handle');
+
+    // Append elements
+    this.sidebarElement.appendChild(sidebarHeader);
+    this.sidebarElement.appendChild(this.contentContainer);
+    this.sidebarElement.appendChild(this.resizeHandle);
+
+    // Add event listeners for resizing
+    this.setupResizing();
     document.body.appendChild(this.sidebarElement);
+  }
+
+  setupResizing() {
+    let isResizing = false;
+    let startX;
+
+    this.resizeHandle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      this.sidebarElement.classList.add('resizing');
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', stopResize);
+    });
+
+    const resize = (e) => {
+      if (!isResizing) return;
+      const dx = startX - e.clientX;
+      const newWidth = this.sidebarElement.offsetWidth + dx;
+      this.sidebarElement.style.width = `${newWidth}px`;
+      startX = e.clientX;
+    };
+
+    const stopResize = () => {
+      isResizing = false;
+      this.sidebarElement.classList.remove('resizing');
+      document.removeEventListener('mousemove', resize);
+      document.removeEventListener('mouseup', stopResize);
+    };
   }
 
   setupMessageListener() {
@@ -41,14 +96,14 @@ class SimplificationSidebar {
   }
 
   renderSidebar() {
-    if (!this.sidebarElement) return;
+    if (!this.contentContainer) return;
 
-    this.sidebarElement.innerHTML = this.simplifications.length 
+    this.contentContainer.innerHTML = this.simplifications.length 
       ? this.simplifications.map((item, index) => `
           <div class="simplification-card">
             <button class="delete-button" data-index="${index}">&times;</button>
-            <div class="original-text">${item.originalText}</div>
-            <div class="simplified-text">${item.simplifiedText}</div>
+            <div class="original-text">${this.escapeHTML(item.originalText)}</div>
+            <div class="simplified-text">${this.escapeHTML(item.simplifiedText)}</div>
             <div class="metadata">
               <span>${new URL(item.url).hostname}</span>
               <span>${new Date(item.timestamp).toLocaleString()}</span>
@@ -58,6 +113,18 @@ class SimplificationSidebar {
       : '<div class="placeholder">No simplifications yet</div>';
 
     this.attachDeleteHandlers();
+  }
+
+  // HTML escape to prevent XSS
+  escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
   }
 
   attachDeleteHandlers() {
@@ -84,6 +151,10 @@ class SimplificationSidebar {
 
   toggleSidebar() {
     this.sidebarElement.classList.toggle('hidden');
+  }
+
+  hideSidebar() {
+    this.sidebarElement.classList.add('hidden');
   }
 
   showSidebar() {

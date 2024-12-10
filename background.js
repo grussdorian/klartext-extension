@@ -30,10 +30,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const savedAudience = result.globalAudience || 'general public';
       
       // Make API request to simplification service
-      fetch('http://localhost:7171/simplify', {
+      // fetch('http://localhost:7171/simplify', {
+      fetch('https://simplifymytext.org:7171/simplify', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'token': 'e7980e01a70dbe30f19d98d17595d3ff71bb9b88b3afd2c4ba3948bf61d5a295'
         },
         body: JSON.stringify({
           text: message.text,
@@ -54,7 +56,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           originalText: message.text,
           simplifiedText: data.simplifiedText,
           url: sender.tab.url,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          audience: savedAudience // Include audience
         });
       })
       .catch(error => {

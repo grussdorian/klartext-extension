@@ -179,7 +179,8 @@ class SimplificationSidebar {
         originalText: data.originalText,
         simplifiedText: data.simplifiedText,
         url: data.url,
-        timestamp: data.timestamp
+        timestamp: data.timestamp,
+        audience: data.audience // Include audience
       };
 
       this.simplifications.push(simplification);
@@ -198,8 +199,9 @@ class SimplificationSidebar {
             <div class="original-text">${this.escapeHTML(item.originalText)}</div>
             <div class="simplified-text">${this.escapeHTML(item.simplifiedText)}</div>
             <div class="metadata">
-              <span>${new URL(item.url).hostname}</span>
+
               <span>${new Date(item.timestamp).toLocaleString()}</span>
+              <span>${this.escapeHTML(item.audience)}</span> <!-- Display audience -->
             </div>
           </div>
         `).reverse().join('') // Reverse the order to show new cards on top
@@ -210,6 +212,9 @@ class SimplificationSidebar {
 
   // HTML escape to prevent XSS
   escapeHTML(str) {
+    if (typeof str !== 'string') {
+      return '';
+    }
     return str.replace(/[&<>'"]/g, 
       tag => ({
         '&': '&amp;',
